@@ -1,4 +1,5 @@
 package com.example.ecommerce.security;
+import com.example.ecommerce.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
