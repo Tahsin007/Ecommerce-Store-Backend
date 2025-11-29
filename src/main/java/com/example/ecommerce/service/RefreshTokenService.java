@@ -1,5 +1,6 @@
 package com.example.ecommerce.service;
 import com.example.ecommerce.entity.RefreshToken;
+import com.example.ecommerce.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

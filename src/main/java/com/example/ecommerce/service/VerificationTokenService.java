@@ -1,6 +1,7 @@
 package com.example.ecommerce.service;
 import com.example.ecommerce.entity.User;
 import com.example.ecommerce.entity.VerificationToken;
+import com.example.ecommerce.repository.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
