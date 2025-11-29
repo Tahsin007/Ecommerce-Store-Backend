@@ -1,0 +1,33 @@
+# 006-insert-default-roles.yaml
+databaseChangeLog:
+  - changeSet:
+      id: 006-insert-default-roles
+      author: developer
+      changes:
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: ROLE_USER
+              - column:
+                  name: description
+                  value: Default user role
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: ROLE_ADMIN
+              - column:
+                  name: description
+                  value: Administrator role
+        - insert:
+            tableName: roles
+            columns:
+              - column:
+                  name: name
+                  value: ROLE_MODERATOR
+              - column:
+                  name: description
+                  value: Moderator role
