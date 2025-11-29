@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - preConditions:
+      - runningAs:
+          username: postgres
+  - include:
+      file: "001-create-users-table.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "002-create-roles-table.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "003-create-user-roles-table.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "004-create-refresh-tokens-table.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "005-create-verification-tokens-table.yaml"
+      relativeToChangelogFile: true
+  - include:
+      file: "006-insert-default-roles.yaml"
+      relativeToChangelogFile: true
