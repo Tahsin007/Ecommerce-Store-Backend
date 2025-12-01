@@ -21,8 +21,11 @@ public class ProductController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public Flux<ProductDTO> getAllProducts() {
-        return productService.getAllProducts();
+    public Flux<ProductDTO> getAllProducts(
+        @RequestParam(required = false) Integer limit,
+        @RequestParam(required = false) String sort
+    ) {
+        return productService.getAllProducts(limit, sort);
     }
 
     @PostMapping

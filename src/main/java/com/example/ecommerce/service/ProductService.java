@@ -6,15 +6,12 @@ import com.example.ecommerce.dto.response.ProductDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,13 +25,19 @@ public class ProductService {
     @Value("${fakestore.api.base-url}")
     private String fakeStoreBaseUrl;
 
-    public Flux<ProductDTO> getAllProducts() {
+    public Flux<ProductDTO> getAllProducts(Integer limit, String sort) {
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(fakeStoreBaseUrl + "/products");
+        if (limit != null && limit > 0) {
+            uriBuilder.queryParam("limit", limit);
+        }
+        if (sort != null && !sort.isBlank()) {
+            uriBuilder.queryParam("sort", sort); // "desc" or "asc"
+        }
+
         return webClient.get()
-            .uri(fakeStoreBaseUrl + "/products")
+            .uri(uriBuilder.toUriString())
             .retrieve()
             .bodyToFlux(ProductDTO.class)
-            .collectList()
-            .flatMapMany(products -> Flux.fromIterable(new ArrayList<>(products)))
             .doOnError(e -> log.error("Error fetching products", e));
     }
 
@@ -105,8 +108,6 @@ public class ProductService {
             .uri(fakeStoreBaseUrl + "/products/category/" + category)
             .retrieve()
             .bodyToFlux(ProductDTO.class)
-            .collectList()
-            .flatMapMany(products -> Flux.fromIterable(new ArrayList<>(products)))
             .doOnError(e -> log.error("Error fetching products by category: {}", category, e));
     }
 
@@ -115,8 +116,6 @@ public class ProductService {
             .uri(fakeStoreBaseUrl + "/products/categories")
             .retrieve()
             .bodyToFlux(String.class)
-            .collectList()
-            .flatMapMany(categories -> Flux.fromIterable(new ArrayList<>(categories)))
             .doOnError(e -> log.error("Error fetching categories", e));
     }
 }

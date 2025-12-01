@@ -36,7 +36,7 @@ public class EmailService {
 
                     helper.setFrom(fromEmail);
                     helper.setTo(email);
-                    helper.setSubject("Verify your AI Mesh account");
+                    helper.setSubject("Verify Your Account");
                     helper.setText(htmlContent, true); // true = HTML
 
                     mailSender.send(message);
@@ -52,25 +52,6 @@ public class EmailService {
             .then();
     }
 
-//    public Mono<Void> sendVerificationEmail(String to, String token) {
-//        return Mono.fromRunnable(() -> {
-//            try {
-//                SimpleMailMessage message = new SimpleMailMessage();
-//                message.setFrom(fromEmail);
-//                message.setTo(to);
-//                message.setSubject("Email Verification");
-//                message.setText("Please verify your email by clicking the link below:\n\n" +
-//                    frontendUrl + "/verify-email?token=" + token +
-//                    "\n\nThis link will expire in 24 hours.");
-//
-//                mailSender.send(message);
-//                log.info("Verification email sent to: {}", to);
-//            } catch (Exception e) {
-//                log.error("Failed to send verification email", e);
-//                throw new RuntimeException("Failed to send verification email", e);
-//            }
-//        }).subscribeOn(Schedulers.boundedElastic()).then();
-//    }
 
     public Mono<Void> sendPasswordResetEmail(String to, String token) {
         return Mono.fromRunnable(() -> {
@@ -117,7 +98,7 @@ public class EmailService {
                       </tr>
                     </table>
                     <p style="text-align:center; font-size:12px; color:#aaa; margin-top:20px;">
-                      © 2025 AI Mesh. All rights reserved.
+                      © 2025 Ecommerce Store. All rights reserved.
                     </p>
                   </body>
                 </html>

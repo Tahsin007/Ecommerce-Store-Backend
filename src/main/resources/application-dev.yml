@@ -1,6 +1,6 @@
 app:
   name: "ecommerce"
-  frontend-url: "http://localhost:3000"
+  frontend-url: "http://localhost:5173"
   support-email: "support@example.com"
 
 fakestore:
