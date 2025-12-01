@@ -8,11 +8,11 @@ import com.example.ecommerce.exception.BadRequestException;
 import com.example.ecommerce.exception.ResourceNotFoundException;
 import com.example.ecommerce.exception.UnauthorizedException;
 import com.example.ecommerce.repository.UserRepository;
+import com.example.ecommerce.repository.UserRoleRepository;
 import com.example.ecommerce.security.CustomUserDetails;
 import com.example.ecommerce.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -26,12 +26,12 @@ import java.util.UUID;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider tokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final VerificationTokenService verificationTokenService;
     private final EmailService emailService;
-    private final DatabaseClient databaseClient;
 
     public Mono<MessageResponse> signup(SignupRequest request) {
         return userRepository.existsByUsername(request.getUsername())
@@ -60,7 +60,7 @@ public class AuthService {
 
                 return userRepository.save(user);
             })
-            .flatMap(savedUser -> assignDefaultRole(savedUser.getId())
+            .flatMap(savedUser -> userRoleRepository.assignDefaultRole(savedUser.getId())
                 .then(verificationTokenService.createVerificationToken(savedUser, "EMAIL_VERIFICATION"))
                 .flatMap(token -> emailService.sendVerificationEmail(savedUser.getEmail(), token))
                 .thenReturn(new MessageResponse("User registered successfully. Please check your email to verify your account.")))
@@ -84,7 +84,7 @@ public class AuthService {
                 if (!user.getIsEnabled()) {
                     return Mono.error(new UnauthorizedException("Account is disabled"));
                 }
-                return getUserRoles(user.getId())
+                return userRoleRepository.findRoleNamesByUserId(user.getId())
                     .collectList()
                     .flatMap(roles -> {
                         CustomUserDetails userDetails = new CustomUserDetails(
@@ -129,7 +129,7 @@ public class AuthService {
                 }
 
                 return userRepository.findById(refreshToken.getUserId())
-                    .flatMap(user -> getUserRoles(user.getId())
+                    .flatMap(user -> userRoleRepository.findRoleNamesByUserId(user.getId())
                         .collectList()
                         .map(roles -> {
                             CustomUserDetails userDetails = new CustomUserDetails(
@@ -206,29 +206,5 @@ public class AuthService {
                     .then(verificationTokenService.deleteByUserId(token.getUserId()))
                     .thenReturn(new MessageResponse("Password reset successfully"));
             });
-    }
-
-    private Mono<Void> assignDefaultRole(Long userId) {
-        String sql = """
-            INSERT INTO user_roles (user_id, role_id)
-            SELECT :userId, id FROM roles WHERE name = 'ROLE_USER'
-            """;
-
-        return databaseClient.sql(sql)
-            .bind("userId", userId)
-            .then();
-    }
-
-    private reactor.core.publisher.Flux<String> getUserRoles(Long userId) {
-        String query = """
-            SELECT r.name FROM roles r
-            JOIN user_roles ur ON r.id = ur.role_id
-            WHERE ur.user_id = :userId
-            """;
-
-        return databaseClient.sql(query)
-            .bind("userId", userId)
-            .map(row -> row.get("name", String.class))
-            .all();
     }
 }

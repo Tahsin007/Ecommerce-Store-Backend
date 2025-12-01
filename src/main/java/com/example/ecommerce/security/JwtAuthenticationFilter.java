@@ -34,13 +34,13 @@ public class JwtAuthenticationFilter implements WebFilter {
                             null,
                             userDetails.getAuthorities()
                         );
-
+                    // Correct way: write to context before filtering
                     return chain.filter(exchange)
                         .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
-                })
-                .switchIfEmpty(chain.filter(exchange));
+                });
         }
 
+        // If no token, proceed without authentication
         return chain.filter(exchange);
     }
 
